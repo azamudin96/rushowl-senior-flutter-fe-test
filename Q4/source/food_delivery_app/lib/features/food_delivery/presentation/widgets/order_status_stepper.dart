@@ -83,7 +83,8 @@ class _OrderStatusStepperState extends State<OrderStatusStepper>
           ),
         );
 
-        return IntrinsicHeight(
+        return SizedBox(
+          height: isLast ? 56 : 80,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [

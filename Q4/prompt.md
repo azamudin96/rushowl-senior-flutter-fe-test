@@ -30,8 +30,8 @@
 >
 > **Mock Data (local datasource):**
 > - 6 restaurants: Pizza Palace (Italian, 4.8★), Dragon Wok (Chinese, 4.6★), Taco Heaven (Mexican, 4.7★), Sushi Master (Japanese, 4.9★), Burger Joint (American, 4.5★), Spice Route (Indian, 4.7★)
-> - 5 menu items per restaurant with realistic names, descriptions, prices ($8–$25)
-> - Images: `https://picsum.photos/seed/{item-name}/400/300` (seed-based for consistency)
+> - 10 menu items per restaurant (60 total) with realistic names, descriptions, prices ($8–$25), grouped into Mains / Sides / Drinks categories
+> - Images: real food photos from TheMealDB and Foodish API, with `https://picsum.photos/seed/{item-name}/400/300` as fallback
 >
 > **4 Screens:**
 > 1. **RestaurantListScreen** — AppBar with title "Food Delivery" + CartBadge icon. Body: ListView.builder of RestaurantCard widgets. Tap card → navigate to FoodMenuScreen.
@@ -43,7 +43,7 @@
 >
 > **Theme:**
 > - Material 3, dark mode only, `useMaterial3: true`
-> - Primary: #FF6B35 (warm orange)
+> - Primary: #FFB800 (gold)
 > - Background: #1A1A1A, Surface: #2A2A2A, Border: #3D3D3D
 > - Font: Google Fonts Poppins
 > - AppBar: transparent, no elevation, centered title
@@ -59,10 +59,23 @@
 > Refine the UI of the Food Delivery app:
 >
 > - **RestaurantCard**: Rounded corners (12px), subtle elevation, restaurant image as background with gradient overlay for text readability. Show rating with star icon, cuisine tag chip, delivery time and fee in row.
-> - **MenuItemCard**: Horizontal layout — image (80x80 rounded) on left, name/description/price on right, "Add to Cart" filled button at bottom-right. Show description max 2 lines with ellipsis.
+> - **MenuItemCard**: Horizontal layout — image (90x90 rounded) on left, name/description/price on right, "Add to Cart" filled button at bottom-right. Show description max 2 lines with ellipsis.
 > - **CheckoutScreen**: Card-based sections — restaurant info card at top, scrollable items list in middle, sticky price breakdown card at bottom above Place Order button.
-> - **OrderStatusStepper**: Vertical timeline with connecting line. Each stage: circle icon + label + optional subtitle. Completed = primary color + checkmark. Current = primary color + pulsing animation (AnimatedContainer). Upcoming = grey.
+> - **OrderStatusStepper**: Vertical timeline with connecting line. Each stage: circle icon + label + optional subtitle. Completed = primary color + checkmark. Current = primary color + pulsing animation (AnimatedBuilder with pulse controller). Upcoming = grey.
 > - Consistent 16px horizontal padding, 12px vertical spacing between cards.
 > - Loading states: centered CircularProgressIndicator with primary color.
 > - Error states: centered icon + message + "Retry" button.
 > - Snackbar confirmation when item added to cart: "Added [item name] to cart".
+
+### Prompt 3 — Performance Optimisation (Q1/Q2 learnings applied)
+
+> Apply the performance patterns I developed in Q1 (list rendering) and Q2 (low-end device essay) to this app:
+>
+> **From Q1 — List Rendering Optimisation:**
+> - Wrap each list tile widget (`RestaurantCard`, `MenuItemCard`, `CartItemTile`) in `RepaintBoundary` so that scrolling only repaints the changed tile, not the entire list.
+> - Add `cacheExtent: 500` to `ListView.builder` (restaurant list) and `CustomScrollView` (food menu) to pre-build offscreen items and reduce visible jank during fast scrolls.
+>
+> **From Q2 — Low-End Device Performance:**
+> - **Image memory capping:** Add `memCacheWidth` / `memCacheHeight` to every `CachedNetworkImage` — sized to the widget's logical pixel dimensions (e.g. 400×180 for restaurant cards, 90×90 for menu thumbnails, 70×70 for cart thumbnails, 600×220 for hero image). This prevents the image cache from storing full-resolution bitmaps.
+> - **Global image cache tuning:** In `main.dart`, after `WidgetsFlutterBinding.ensureInitialized()`, set `PaintingBinding.instance.imageCache.maximumSize = 50` and `maximumSizeBytes = 50 << 20` (50 MB) to cap memory on constrained devices.
+> - **Remove `IntrinsicHeight`:** Replace `IntrinsicHeight` in `OrderStatusStepper` with a fixed-height `SizedBox` (80px per step, 56px for the last step) to avoid expensive multi-pass layout on every status change.

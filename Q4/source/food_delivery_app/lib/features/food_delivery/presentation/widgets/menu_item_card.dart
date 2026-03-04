@@ -20,7 +20,8 @@ class MenuItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
+    return RepaintBoundary(
+      child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: const BoxDecoration(
         border: Border(
@@ -38,6 +39,8 @@ class MenuItemCard extends StatelessWidget {
               width: 90,
               height: 90,
               fit: BoxFit.cover,
+              memCacheWidth: 90,
+              memCacheHeight: 90,
               placeholder: (_, __) => const SizedBox(
                 width: 90,
                 height: 90,
@@ -111,6 +114,7 @@ class MenuItemCard extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }

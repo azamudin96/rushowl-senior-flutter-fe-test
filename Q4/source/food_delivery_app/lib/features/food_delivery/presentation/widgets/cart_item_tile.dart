@@ -21,7 +21,8 @@ class CartItemTile extends StatelessWidget {
     final theme = Theme.of(context);
     final primary = theme.colorScheme.primary;
 
-    return Container(
+    return RepaintBoundary(
+      child: Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -39,6 +40,8 @@ class CartItemTile extends StatelessWidget {
               width: 70,
               height: 70,
               fit: BoxFit.cover,
+              memCacheWidth: 70,
+              memCacheHeight: 70,
               placeholder: (_, __) => const SizedBox(
                 width: 70,
                 height: 70,
@@ -110,6 +113,7 @@ class CartItemTile extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }

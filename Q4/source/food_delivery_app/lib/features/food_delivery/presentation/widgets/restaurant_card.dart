@@ -17,7 +17,8 @@ class RestaurantCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return GestureDetector(
+    return RepaintBoundary(
+      child: GestureDetector(
       onTap: onTap,
       child: Card(
         clipBehavior: Clip.antiAlias,
@@ -35,6 +36,8 @@ class RestaurantCard extends StatelessWidget {
                   CachedNetworkImage(
                     imageUrl: restaurant.imageUrl,
                     fit: BoxFit.cover,
+                    memCacheWidth: 400,
+                    memCacheHeight: 180,
                     placeholder: (_, __) => const ColoredBox(
                       color: Color(0xFF2A2A2A),
                       child: Center(child: CircularProgressIndicator()),
@@ -147,6 +150,7 @@ class RestaurantCard extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }

@@ -51,6 +51,18 @@ flutter pub get
 flutter run
 ```
 
+### Performance Optimisations (from Q1 & Q2)
+
+These patterns were developed during Q1 (list rendering optimisation) and Q2 (low-end device essay), then applied here:
+
+| Technique | Source | Where Applied |
+|---|---|---|
+| `RepaintBoundary` on list tiles | Q1 | `RestaurantCard`, `MenuItemCard`, `CartItemTile` |
+| `cacheExtent: 500` on scroll views | Q1 | `RestaurantListScreen` ListView, `FoodMenuScreen` CustomScrollView |
+| `memCacheWidth`/`memCacheHeight` on images | Q1 + Q2 | All `CachedNetworkImage` widgets (400×180, 90×90, 70×70, 600×220) |
+| Global image cache cap (50 entries / 50 MB) | Q2 | `main.dart` |
+| Replace `IntrinsicHeight` with fixed `SizedBox` | Q2 | `OrderStatusStepper` (avoids expensive multi-pass layout) |
+
 ### What I Would Improve
 
 - Add unit tests for cubits (especially CartCubit's multi-restaurant logic and OrderCubit's timer)
