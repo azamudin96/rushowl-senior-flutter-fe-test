@@ -20,24 +20,81 @@ class FoodMenuScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => getIt<MenuCubit>()..loadMenu(restaurant),
-      child: const _FoodMenuView(),
+      child: _FoodMenuView(restaurantName: restaurant.name),
     );
   }
 }
 
-class _FoodMenuView extends StatelessWidget {
-  const _FoodMenuView();
+class _FoodMenuView extends StatefulWidget {
+  final String restaurantName;
+
+  const _FoodMenuView({required this.restaurantName});
+
+  @override
+  State<_FoodMenuView> createState() => _FoodMenuViewState();
+}
+
+class _FoodMenuViewState extends State<_FoodMenuView> {
+  bool _isSearching = false;
+  String _searchQuery = '';
+  final _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _toggleSearch() {
+    setState(() {
+      _isSearching = !_isSearching;
+      if (!_isSearching) {
+        _searchController.clear();
+        _searchQuery = '';
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        actions: const [
+        title: _isSearching
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                onChanged: (q) => setState(() => _searchQuery = q),
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: 'Search menu...',
+                  hintStyle: const TextStyle(color: Colors.white38),
+                  border: InputBorder.none,
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.close, color: Colors.white54),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() => _searchQuery = '');
+                          },
+                        )
+                      : null,
+                ),
+              )
+            : Text(
+                widget.restaurantName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+        actions: [
           IconButton(
-            onPressed: null,
-            icon: Icon(Icons.search, color: Colors.white),
+            onPressed: _toggleSearch,
+            icon: Icon(
+              _isSearching ? Icons.close : Icons.search,
+              color: Colors.white,
+            ),
           ),
-          CartBadge(),
+          const CartBadge(),
         ],
       ),
       body: BlocBuilder<MenuCubit, MenuState>(
@@ -46,7 +103,11 @@ class _FoodMenuView extends StatelessWidget {
             MenuInitial() || MenuLoading() =>
               const Center(child: CircularProgressIndicator()),
             MenuLoaded(:final restaurant, :final items) =>
-              _MenuContent(restaurant: restaurant, items: items),
+              _MenuContent(
+                restaurant: restaurant,
+                items: items,
+                searchQuery: _searchQuery,
+              ),
             MenuError(:final message) => Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -60,31 +121,6 @@ class _FoodMenuView extends StatelessWidget {
           };
         },
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        onTap: (_) {},
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_outlined),
-            activeIcon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.receipt_long_outlined),
-            activeIcon: Icon(Icons.receipt_long),
-            label: 'Orders',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            activeIcon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-      ),
     );
   }
 }
@@ -92,8 +128,13 @@ class _FoodMenuView extends StatelessWidget {
 class _MenuContent extends StatefulWidget {
   final Restaurant restaurant;
   final List<MenuItem> items;
+  final String searchQuery;
 
-  const _MenuContent({required this.restaurant, required this.items});
+  const _MenuContent({
+    required this.restaurant,
+    required this.items,
+    this.searchQuery = '',
+  });
 
   @override
   State<_MenuContent> createState() => _MenuContentState();
@@ -101,6 +142,33 @@ class _MenuContent extends StatefulWidget {
 
 class _MenuContentState extends State<_MenuContent> {
   String _selectedCategory = 'All Items';
+  final _scrollController = ScrollController();
+
+  @override
+  void didUpdateWidget(covariant _MenuContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.searchQuery != widget.searchQuery) {
+      _scrollToResults();
+    }
+  }
+
+  void _scrollToResults() {
+    if (!_scrollController.hasClients) return;
+    // Scroll to just below the hero + chips (~340px)
+    const targetOffset = 340.0;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    _scrollController.animateTo(
+      targetOffset.clamp(0.0, maxScroll),
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -108,6 +176,7 @@ class _MenuContentState extends State<_MenuContent> {
     final filteredItems = _filteredItems;
 
     return CustomScrollView(
+      controller: _scrollController,
       cacheExtent: 500,
       slivers: [
         // Hero image + info card combined in one sliver
@@ -130,20 +199,49 @@ class _MenuContentState extends State<_MenuContent> {
           ),
         ),
 
-        // Menu items
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (context, index) {
-              final item = filteredItems[index];
-              return MenuItemCard(
-                item: item,
-                onAddToCart: () => _handleAddToCart(context, item),
-              );
-            },
-            childCount: filteredItems.length,
+        // Menu items or empty state
+        if (filteredItems.isEmpty)
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: AnimatedOpacity(
+              opacity: 1.0,
+              duration: const Duration(milliseconds: 300),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.search_off, size: 48, color: Colors.white38),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No items found',
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        color: Colors.white54,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          )
+        else ...[
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                final item = filteredItems[index];
+                return _AnimatedMenuItemEntry(
+                  key: ValueKey(item.id),
+                  index: index,
+                  child: MenuItemCard(
+                    item: item,
+                    onAddToCart: () => _handleAddToCart(context, item),
+                  ),
+                );
+              },
+              childCount: filteredItems.length,
+            ),
           ),
-        ),
-        const SliverPadding(padding: EdgeInsets.only(bottom: 16)),
+          const SliverPadding(padding: EdgeInsets.only(bottom: 16)),
+        ],
       ],
     );
   }
@@ -154,10 +252,19 @@ class _MenuContentState extends State<_MenuContent> {
       ];
 
   List<MenuItem> get _filteredItems {
-    if (_selectedCategory == 'All Items') return widget.items;
-    return widget.items
-        .where((item) => item.category == _selectedCategory)
-        .toList();
+    var items = widget.items;
+    if (_selectedCategory != 'All Items') {
+      items = items
+          .where((item) => item.category == _selectedCategory)
+          .toList();
+    }
+    if (widget.searchQuery.isNotEmpty) {
+      final query = widget.searchQuery.toLowerCase();
+      items = items
+          .where((item) => item.name.toLowerCase().contains(query))
+          .toList();
+    }
+    return items;
   }
 
   void _handleAddToCart(BuildContext context, MenuItem item) {
@@ -482,6 +589,64 @@ class _CategoryChips extends StatelessWidget {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class _AnimatedMenuItemEntry extends StatefulWidget {
+  final int index;
+  final Widget child;
+
+  const _AnimatedMenuItemEntry({
+    super.key,
+    required this.index,
+    required this.child,
+  });
+
+  @override
+  State<_AnimatedMenuItemEntry> createState() => _AnimatedMenuItemEntryState();
+}
+
+class _AnimatedMenuItemEntryState extends State<_AnimatedMenuItemEntry>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _opacity;
+  late final Animation<Offset> _slide;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    final delay = (widget.index * 0.06).clamp(0.0, 0.4);
+    final curved = CurvedAnimation(
+      parent: _controller,
+      curve: Interval(delay, 1.0, curve: Curves.easeOut),
+    );
+    _opacity = Tween<double>(begin: 0, end: 1).animate(curved);
+    _slide = Tween<Offset>(
+      begin: const Offset(0, 0.1),
+      end: Offset.zero,
+    ).animate(curved);
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SlideTransition(
+      position: _slide,
+      child: FadeTransition(
+        opacity: _opacity,
+        child: widget.child,
       ),
     );
   }
