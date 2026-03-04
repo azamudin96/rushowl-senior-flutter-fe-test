@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:intl/intl.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../../../../di/injection.dart';
 import '../../domain/entities/order.dart' as entity;
@@ -8,71 +10,99 @@ import '../cubit/cart_cubit.dart';
 import '../cubit/order_cubit.dart';
 import '../cubit/order_state.dart';
 import '../widgets/order_status_stepper.dart';
+import 'help_support_screen.dart';
 
 final _currencyFormat = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
 
-class OrderTrackingScreen extends StatelessWidget {
-  const OrderTrackingScreen({super.key});
+class OrderTrackingScreen extends StatefulWidget {
+  final bool popToFirst;
+
+  const OrderTrackingScreen({super.key, this.popToFirst = true});
+
+  @override
+  State<OrderTrackingScreen> createState() => _OrderTrackingScreenState();
+}
+
+class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
+  bool _isPopping = false;
+
+  void _closeAndClearCart() {
+    if (_isPopping) return;
+    _isPopping = true;
+    if (widget.popToFirst) {
+      getIt<CartCubit>().clearCart();
+      Navigator.of(context).popUntil((route) => route.isFirst);
+    } else {
+      Navigator.of(context).pop();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: false,
+      canPop: !widget.popToFirst,
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop) {
-          _closeAndClearCart(context);
+          _closeAndClearCart();
         }
       },
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Order Status'),
           leading: IconButton(
-            onPressed: () => _closeAndClearCart(context),
+            onPressed: _closeAndClearCart,
             icon: const Icon(Icons.chevron_left, size: 28),
           ),
           actions: [
-            Container(
-              margin: const EdgeInsets.only(right: 8),
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              child: const Icon(
-                Icons.help_outline,
-                color: Colors.black,
-                size: 20,
+            GestureDetector(
+              onTap: () {
+                final state = context.read<OrderCubit>().state;
+                if (state is OrderTracking) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          HelpSupportScreen(order: state.order),
+                    ),
+                  );
+                }
+              },
+              child: Container(
+                margin: const EdgeInsets.only(right: 8),
+                width: 38,
+                height: 38,
+                child: Icon(
+                  Icons.help_outline,
+                  color: Theme.of(context).colorScheme.primary,
+                  size: 24,
+                ),
               ),
             ),
           ],
         ),
-        body: BlocBuilder<OrderCubit, OrderState>(
-          builder: (context, state) {
-            return switch (state) {
-              OrderInitial() || OrderPlacing() =>
-                const Center(child: CircularProgressIndicator()),
-              OrderTracking(:final order) => _TrackingContent(order: order),
-              OrderError(:final message) => Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.error_outline, size: 48),
-                      const SizedBox(height: 16),
-                      Text(message),
-                    ],
-                  ),
-                ),
-            };
-          },
-        ),
+        body: _isPopping
+            ? const SizedBox.shrink()
+            : BlocBuilder<OrderCubit, OrderState>(
+                builder: (context, state) {
+                  return switch (state) {
+                    OrderInitial() || OrderPlacing() =>
+                      const Center(child: CircularProgressIndicator()),
+                    OrderTracking(:final order) =>
+                      _TrackingContent(order: order),
+                    OrderError(:final message) => Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.error_outline, size: 48),
+                            const SizedBox(height: 16),
+                            Text(message),
+                          ],
+                        ),
+                      ),
+                  };
+                },
+              ),
       ),
     );
-  }
-
-  void _closeAndClearCart(BuildContext context) {
-    getIt<CartCubit>().clearCart();
-    Navigator.of(context).popUntil((route) => route.isFirst);
   }
 }
 
@@ -133,40 +163,69 @@ class _TrackingContent extends StatelessWidget {
 
                 const SizedBox(height: 24),
 
-                // ── Map Placeholder ──
+                // ── Live Map ──
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 16),
                   height: 200,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1A1A1A),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: const Color(0xFF2A2A2A)),
                   ),
+                  clipBehavior: Clip.antiAlias,
                   child: Stack(
                     children: [
-                      // Grid pattern to simulate map
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(16),
-                        child: CustomPaint(
-                          size: const Size(double.infinity, 200),
-                          painter: _MapGridPainter(),
-                        ),
-                      ),
-                      // Center pin
-                      Center(
-                        child: Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: primary,
-                          ),
-                          child: const Icon(
-                            Icons.navigation,
-                            color: Colors.black,
-                            size: 20,
+                      FlutterMap(
+                        options: MapOptions(
+                          initialCenter: LatLng(3.1390, 101.6869),
+                          initialZoom: 14,
+                          interactionOptions: const InteractionOptions(
+                            flags: InteractiveFlag.none,
                           ),
                         ),
+                        children: [
+                          TileLayer(
+                            urlTemplate:
+                                'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                            userAgentPackageName:
+                                'com.example.food_delivery_app',
+                          ),
+                          MarkerLayer(
+                            markers: [
+                              Marker(
+                                point: LatLng(3.1360, 101.6839),
+                                child: Icon(
+                                  Icons.restaurant,
+                                  color: primary,
+                                  size: 28,
+                                ),
+                              ),
+                              Marker(
+                                point: LatLng(3.1390, 101.6869),
+                                child: Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: primary,
+                                  ),
+                                  child: const Icon(
+                                    Icons.navigation,
+                                    color: Colors.black,
+                                    size: 20,
+                                  ),
+                                ),
+                              ),
+                              const Marker(
+                                point: LatLng(3.1420, 101.6899),
+                                child: Icon(
+                                  Icons.location_on,
+                                  color: Colors.redAccent,
+                                  size: 28,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                       // Map label
                       Positioned(
@@ -345,26 +404,4 @@ class _TrackingContent extends StatelessWidget {
       ],
     );
   }
-}
-
-/// Simple grid painter to simulate a map background.
-class _MapGridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFF252525)
-      ..strokeWidth = 0.5;
-
-    // Horizontal lines
-    for (double y = 0; y < size.height; y += 30) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
-    }
-    // Vertical lines
-    for (double x = 0; x < size.width; x += 30) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
