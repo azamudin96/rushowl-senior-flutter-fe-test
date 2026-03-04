@@ -8,6 +8,9 @@ import '../cubit/restaurant_list_state.dart';
 import '../widgets/cart_badge.dart';
 import '../widgets/restaurant_card.dart';
 import 'food_menu_screen.dart';
+import 'order_history_screen.dart';
+import 'profile_screen.dart';
+import 'search_screen.dart';
 
 class RestaurantListScreen extends StatelessWidget {
   const RestaurantListScreen({super.key});
@@ -36,10 +39,6 @@ class _RestaurantListViewState extends State<_RestaurantListView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {},
-          icon: const Icon(Icons.menu),
-        ),
         title: const Text(
           'RushTrail Eats',
           style: TextStyle(fontWeight: FontWeight.bold),
@@ -89,7 +88,29 @@ class _RestaurantListViewState extends State<_RestaurantListView> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _navIndex,
-        onTap: (i) => setState(() => _navIndex = i),
+        onTap: (i) {
+          if (i == 1) {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const SearchScreen(),
+              ),
+            );
+          } else if (i == 2) {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const OrderHistoryScreen(),
+              ),
+            );
+          } else if (i == 3) {
+            Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const ProfileScreen(),
+              ),
+            );
+          } else {
+            setState(() => _navIndex = i);
+          }
+        },
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home_outlined),

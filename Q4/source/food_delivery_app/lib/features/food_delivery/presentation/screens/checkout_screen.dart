@@ -20,9 +20,14 @@ class CheckoutScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Checkout'),
         actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.more_horiz, color: Colors.white),
+          BlocBuilder<CartCubit, CartState>(
+            builder: (context, state) {
+              if (state.isEmpty) return const SizedBox.shrink();
+              return IconButton(
+                onPressed: () => _showClearCartDialog(context),
+                icon: const Icon(Icons.delete_outline, color: Colors.white),
+              );
+            },
           ),
         ],
       ),
@@ -33,6 +38,31 @@ class CheckoutScreen extends StatelessWidget {
           }
           return _CheckoutContent(state: state);
         },
+      ),
+    );
+  }
+
+  void _showClearCartDialog(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Clear cart?'),
+        content: const Text(
+          'Are you sure you want to remove all items from your cart?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              context.read<CartCubit>().clearCart();
+              Navigator.of(dialogContext).pop();
+            },
+            child: const Text('Clear'),
+          ),
+        ],
       ),
     );
   }
