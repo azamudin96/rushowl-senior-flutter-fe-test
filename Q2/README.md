@@ -27,9 +27,9 @@ Disposing controllers (`AnimationController`, `ScrollController`, etc.) is equal
 
 ## Network & Data
 
-Budget phones often come with unreliable connectivity. I always paginate API calls — on one project we were fetching 500+ items upfront and the screen would hang on slower connections. Cursor-based pagination with 20 items per page made it feel instant.
+Budget phones often come with unreliable connectivity. I always paginate API calls — cursor-based pagination with 20 items per page prevents the screen from hanging on slower connections.
 
-HTTP `ETag` headers prevent re-downloading unchanged data, and Hive works well for offline storage. For API responses I also enable gzip compression where possible, which reduces payload sizes significantly on slow mobile networks. For images, I serve thumbnails in list views and load full resolution only on detail screens.
+HTTP `ETag` headers prevent re-downloading unchanged data, and Hive works well for offline storage. I enable gzip compression where possible, reducing payload sizes on slow networks. For images, I serve thumbnails in list views and load full resolution only on detail screens.
 
 Large JSON responses can also block the UI thread. I move heavy parsing to a separate isolate:
 
@@ -43,13 +43,15 @@ This keeps the UI thread free during CPU-heavy work.
 
 Debug builds use JIT with assertion checks — significantly slower than release. I always profile with `--profile` on a real device. Release builds compile to native ARM via AOT, which is a completely different performance profile.
 
-`--split-debug-info` and `--obfuscate` reduce APK size, improving download and install time. Runtime memory however is primarily determined by decoded assets and Dart heap allocations, not binary size. I also audit `pubspec.yaml` regularly — unused plugins add startup overhead from platform channel initialisation.
+`--split-debug-info` and `--obfuscate` reduce APK size, improving download and install time. Dart's tree-shaking removes unreachable code automatically in release mode, but it only works if you avoid reflection and dynamic lookups — keeping imports explicit ensures dead code is actually eliminated. For larger apps, deferred components (`deferred as`) let you split features into separate download units so the initial binary stays small and loads fast on constrained storage.
+
+I also audit `pubspec.yaml` regularly — unused plugins add startup overhead from platform channel initialisation.
 
 ## Profiling & Tooling
 
 Profile on real hardware — emulators skip GPU bottlenecks, thermal throttling, and memory pressure. I keep a cheap Redmi in my drawer specifically for this.
 
-In DevTools, I look for timeline spikes above 16ms. If the UI thread is slow, the problem is usually layout or rebuilds. If the raster thread spikes instead, it's typically expensive painting, `saveLayer` usage, or large images. For CI, `integration_test` with `traceAction()` captures frame timings automatically.
+In DevTools, I look for timeline spikes above 16ms. The Performance Overlay (`WidgetsApp.showPerformanceOverlay`) gives a quick on-device read — if the raster bar (bottom) is red, the problem is painting or GPU; if the UI bar (top) is red, it's layout or rebuilds. For deeper analysis, DevTools memory snapshots help track allocations and detect leaks. For CI, `integration_test` with `traceAction()` captures frame timings automatically.
 
 First-time shader compilation can also stutter on weak GPUs. Flutter's `--trace-skia` and `--bundle-sksl-path` flags let you capture and pre-compile shaders to prevent runtime jank.
 
