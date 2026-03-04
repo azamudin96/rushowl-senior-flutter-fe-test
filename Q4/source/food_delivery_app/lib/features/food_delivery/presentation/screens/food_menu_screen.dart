@@ -108,6 +108,7 @@ class _MenuContentState extends State<_MenuContent> {
     final filteredItems = _filteredItems;
 
     return CustomScrollView(
+      cacheExtent: 500,
       slivers: [
         // Hero image + info card combined in one sliver
         SliverToBoxAdapter(
@@ -294,6 +295,7 @@ class _HeroWithInfoCard extends StatelessWidget {
               CachedNetworkImage(
                 imageUrl: restaurant.imageUrl,
                 fit: BoxFit.cover,
+                memCacheWidth: 600,
                 placeholder: (_, __) => const ColoredBox(
                   color: Color(0xFF2A2A2A),
                   child: Center(child: CircularProgressIndicator()),

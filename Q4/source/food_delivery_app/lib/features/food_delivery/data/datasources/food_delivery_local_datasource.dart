@@ -10,8 +10,8 @@ class FoodDeliveryLocalDatasource {
   // Foodish image base
   static const _f = 'https://foodish-api.com/images';
 
-  // Picsum fallback (seed-based, consistent)
-  static const _p = 'https://picsum.photos/seed';
+  // Unsplash direct (stable, food-matched)
+  static const _u = 'https://images.unsplash.com';
 
   final List<Restaurant> _restaurants = const [
     Restaurant(
@@ -80,13 +80,13 @@ class FoodDeliveryLocalDatasource {
       MenuItem(id: 'm4', name: 'Four Cheese Pizza', imageUrl: '$_f/pizza/pizza35.jpg', price: 16.49, description: 'Mozzarella, gorgonzola, parmesan, and fontina on a wood-fired crust.', restaurantId: 'r1', category: 'Mains'),
       MenuItem(id: 'm5', name: 'Penne Arrabbiata', imageUrl: '$_f/pasta/pasta5.jpg', price: 13.49, description: 'Penne in a spicy tomato sauce with garlic and red chili flakes.', restaurantId: 'r1', category: 'Mains'),
       // Sides
-      MenuItem(id: 'm6', name: 'Garlic Bread', imageUrl: '$_p/garlic-bread/400/300', price: 8.49, description: 'Toasted ciabatta with garlic butter and herbs.', restaurantId: 'r1', category: 'Sides'),
-      MenuItem(id: 'm7', name: 'Bruschetta', imageUrl: '$_p/bruschetta/400/300', price: 9.49, description: 'Grilled bread topped with diced tomatoes, basil, and olive oil.', restaurantId: 'r1', category: 'Sides'),
-      MenuItem(id: 'm8', name: 'Caesar Salad', imageUrl: '$_p/caesar-salad/400/300', price: 10.49, description: 'Crisp romaine, parmesan, croutons, and creamy Caesar dressing.', restaurantId: 'r1', category: 'Sides'),
+      MenuItem(id: 'm6', name: 'Garlic Bread', imageUrl: '$_u/photo-1556008531-57e6eefc7be4?w=400&fit=crop', price: 8.49, description: 'Toasted ciabatta with garlic butter and herbs.', restaurantId: 'r1', category: 'Sides'),
+      MenuItem(id: 'm7', name: 'Bruschetta', imageUrl: '$_u/photo-1623962470382-a01d602b3a16?w=400&fit=crop', price: 9.49, description: 'Grilled bread topped with diced tomatoes, basil, and olive oil.', restaurantId: 'r1', category: 'Sides'),
+      MenuItem(id: 'm8', name: 'Caesar Salad', imageUrl: '$_u/photo-1556386734-4227a180d19e?w=400&fit=crop', price: 10.49, description: 'Crisp romaine, parmesan, croutons, and creamy Caesar dressing.', restaurantId: 'r1', category: 'Sides'),
       // Drinks
       MenuItem(id: 'm9', name: 'Tiramisu', imageUrl: '$_f/dessert/dessert10.jpg', price: 9.99, description: 'Espresso-soaked ladyfingers layered with mascarpone cream.', restaurantId: 'r1', category: 'Drinks'),
-      MenuItem(id: 'm10', name: 'Italian Soda', imageUrl: '$_p/italian-soda/400/300', price: 5.49, description: 'Sparkling water with your choice of fruit syrup and cream.', restaurantId: 'r1', category: 'Drinks'),
-      MenuItem(id: 'm11', name: 'Espresso', imageUrl: '$_p/espresso/400/300', price: 4.49, description: 'Rich double-shot espresso made with premium Italian beans.', restaurantId: 'r1', category: 'Drinks'),
+      MenuItem(id: 'm10', name: 'Italian Soda', imageUrl: '$_u/photo-1721832905378-cf785bd21033?w=400&fit=crop', price: 5.49, description: 'Sparkling water with your choice of fruit syrup and cream.', restaurantId: 'r1', category: 'Drinks'),
+      MenuItem(id: 'm11', name: 'Espresso', imageUrl: '$_u/photo-1669687924558-386bff1a0469?w=400&fit=crop', price: 4.49, description: 'Rich double-shot espresso made with premium Italian beans.', restaurantId: 'r1', category: 'Drinks'),
     ],
 
     // ── Dragon Wok (Chinese) ──
@@ -102,8 +102,8 @@ class FoodDeliveryLocalDatasource {
       MenuItem(id: 'm18', name: 'Wonton Soup', imageUrl: '$_m/1525876468.jpg', price: 9.49, description: 'Delicate pork wontons in a clear aromatic broth.', restaurantId: 'r2', category: 'Sides'),
       MenuItem(id: 'm19', name: 'Steamed Dumplings', imageUrl: '$_m/sfahy01763752319.jpg', price: 10.49, description: 'Juicy pork and ginger dumplings with soy dipping sauce.', restaurantId: 'r2', category: 'Sides'),
       // Drinks
-      MenuItem(id: 'm20', name: 'Jasmine Tea', imageUrl: '$_p/jasmine-tea/400/300', price: 4.49, description: 'Fragrant hot jasmine green tea, served in a traditional pot.', restaurantId: 'r2', category: 'Drinks'),
-      MenuItem(id: 'm21', name: 'Lychee Juice', imageUrl: '$_p/lychee-juice/400/300', price: 5.99, description: 'Refreshing chilled lychee juice with a hint of lime.', restaurantId: 'r2', category: 'Drinks'),
+      MenuItem(id: 'm20', name: 'Jasmine Tea', imageUrl: '$_u/photo-1731696604052-d0c8527e7831?w=400&fit=crop', price: 4.49, description: 'Fragrant hot jasmine green tea, served in a traditional pot.', restaurantId: 'r2', category: 'Drinks'),
+      MenuItem(id: 'm21', name: 'Lychee Juice', imageUrl: '$_u/photo-1663091544172-794c537af00c?w=400&fit=crop', price: 5.99, description: 'Refreshing chilled lychee juice with a hint of lime.', restaurantId: 'r2', category: 'Drinks'),
     ],
 
     // ── Taco Heaven (Mexican) ──
@@ -111,32 +111,32 @@ class FoodDeliveryLocalDatasource {
       // Mains
       MenuItem(id: 'm22', name: 'Carne Asada Tacos', imageUrl: '$_m/uvuyxu1503067369.jpg', price: 13.49, description: 'Grilled steak tacos with fresh cilantro, onion, and lime.', restaurantId: 'r3', category: 'Mains'),
       MenuItem(id: 'm23', name: 'Chicken Burrito', imageUrl: '$_m/tvtxpq1511464705.jpg', price: 12.99, description: 'Flour tortilla stuffed with seasoned chicken, rice, beans, and cheese.', restaurantId: 'r3', category: 'Mains'),
-      MenuItem(id: 'm24', name: 'Quesadilla', imageUrl: '$_p/quesadilla/400/300', price: 10.99, description: 'Grilled flour tortilla with melted cheese, peppers, and sour cream.', restaurantId: 'r3', category: 'Mains'),
+      MenuItem(id: 'm24', name: 'Quesadilla', imageUrl: '$_u/photo-1723874564890-a0c678615460?w=400&fit=crop', price: 10.99, description: 'Grilled flour tortilla with melted cheese, peppers, and sour cream.', restaurantId: 'r3', category: 'Mains'),
       MenuItem(id: 'm25', name: 'Enchiladas', imageUrl: '$_m/qtuwxu1468233098.jpg', price: 14.49, description: 'Corn tortillas filled with chicken, smothered in red chili sauce and cheese.', restaurantId: 'r3', category: 'Mains'),
       // Sides
-      MenuItem(id: 'm26', name: 'Guacamole & Chips', imageUrl: '$_p/guacamole/400/300', price: 8.99, description: 'Fresh avocado dip with tomato, onion, lime, and crispy tortilla chips.', restaurantId: 'r3', category: 'Sides'),
-      MenuItem(id: 'm27', name: 'Elote', imageUrl: '$_p/elote/400/300', price: 6.99, description: 'Grilled Mexican street corn with mayo, cotija cheese, and chili powder.', restaurantId: 'r3', category: 'Sides'),
+      MenuItem(id: 'm26', name: 'Guacamole & Chips', imageUrl: '$_u/photo-1681406689584-2f7612fa98a4?w=400&fit=crop', price: 8.99, description: 'Fresh avocado dip with tomato, onion, lime, and crispy tortilla chips.', restaurantId: 'r3', category: 'Sides'),
+      MenuItem(id: 'm27', name: 'Elote', imageUrl: '$_u/photo-1667047165840-803e47970128?w=400&fit=crop', price: 6.99, description: 'Grilled Mexican street corn with mayo, cotija cheese, and chili powder.', restaurantId: 'r3', category: 'Sides'),
       MenuItem(id: 'm28', name: 'Churros', imageUrl: '$_f/dessert/dessert20.jpg', price: 7.99, description: 'Crispy cinnamon sugar pastries with chocolate dipping sauce.', restaurantId: 'r3', category: 'Sides'),
       // Drinks
-      MenuItem(id: 'm29', name: 'Horchata', imageUrl: '$_p/horchata/400/300', price: 5.49, description: 'Creamy rice-based drink with cinnamon and vanilla.', restaurantId: 'r3', category: 'Drinks'),
-      MenuItem(id: 'm30', name: 'Agua Fresca', imageUrl: '$_p/agua-fresca/400/300', price: 4.99, description: 'Light watermelon and lime refresher with a hint of mint.', restaurantId: 'r3', category: 'Drinks'),
+      MenuItem(id: 'm29', name: 'Horchata', imageUrl: '$_u/photo-1667238860380-a4238b7f41c8?w=400&fit=crop', price: 5.49, description: 'Creamy rice-based drink with cinnamon and vanilla.', restaurantId: 'r3', category: 'Drinks'),
+      MenuItem(id: 'm30', name: 'Agua Fresca', imageUrl: '$_u/photo-1732578506502-6252d3f4008c?w=400&fit=crop', price: 4.99, description: 'Light watermelon and lime refresher with a hint of mint.', restaurantId: 'r3', category: 'Drinks'),
     ],
 
     // ── Sushi Master (Japanese) ──
     'r4': [
       // Mains
       MenuItem(id: 'm31', name: 'Salmon Sashimi', imageUrl: '$_m/g046bb1663960946.jpg', price: 18.99, description: 'Fresh slices of premium Atlantic salmon, served with wasabi.', restaurantId: 'r4', category: 'Mains'),
-      MenuItem(id: 'm32', name: 'Dragon Roll', imageUrl: '$_p/dragon-roll/400/300', price: 16.99, description: 'Shrimp tempura roll topped with avocado and eel sauce.', restaurantId: 'r4', category: 'Mains'),
+      MenuItem(id: 'm32', name: 'Dragon Roll', imageUrl: '$_u/photo-1673814842325-8482085d2125?w=400&fit=crop', price: 16.99, description: 'Shrimp tempura roll topped with avocado and eel sauce.', restaurantId: 'r4', category: 'Mains'),
       MenuItem(id: 'm33', name: 'Chicken Teriyaki', imageUrl: '$_m/wvpsxx1468256321.jpg', price: 14.99, description: 'Grilled chicken glazed with sweet teriyaki sauce, served with rice.', restaurantId: 'r4', category: 'Mains'),
       MenuItem(id: 'm34', name: 'Tonkotsu Ramen', imageUrl: '$_m/ip5xtp1769779958.jpg', price: 15.99, description: 'Rich pork bone broth with chashu, soft egg, nori, and fresh noodles.', restaurantId: 'r4', category: 'Mains'),
-      MenuItem(id: 'm35', name: 'Spicy Tuna Roll', imageUrl: '$_p/spicy-tuna-roll/400/300', price: 14.49, description: 'Fresh tuna with spicy mayo, cucumber, and sesame seeds.', restaurantId: 'r4', category: 'Mains'),
+      MenuItem(id: 'm35', name: 'Spicy Tuna Roll', imageUrl: '$_u/photo-1723485605996-2f0e04e82575?w=400&fit=crop', price: 14.49, description: 'Fresh tuna with spicy mayo, cucumber, and sesame seeds.', restaurantId: 'r4', category: 'Mains'),
       // Sides
-      MenuItem(id: 'm36', name: 'Miso Soup', imageUrl: '$_p/miso-soup/400/300', price: 8.49, description: 'Traditional soybean paste soup with tofu, seaweed, and scallions.', restaurantId: 'r4', category: 'Sides'),
-      MenuItem(id: 'm37', name: 'Edamame', imageUrl: '$_p/edamame/400/300', price: 6.99, description: 'Steamed young soybeans lightly salted, a classic Japanese appetizer.', restaurantId: 'r4', category: 'Sides'),
+      MenuItem(id: 'm36', name: 'Miso Soup', imageUrl: '$_u/photo-1664391950572-bc4b1bdd1268?w=400&fit=crop', price: 8.49, description: 'Traditional soybean paste soup with tofu, seaweed, and scallions.', restaurantId: 'r4', category: 'Sides'),
+      MenuItem(id: 'm37', name: 'Edamame', imageUrl: '$_u/photo-1666318300348-a4d0226d81ad?w=400&fit=crop', price: 6.99, description: 'Steamed young soybeans lightly salted, a classic Japanese appetizer.', restaurantId: 'r4', category: 'Sides'),
       MenuItem(id: 'm38', name: 'Gyoza', imageUrl: '$_m/wrustq1511475474.jpg', price: 9.49, description: 'Pan-fried pork dumplings with a crispy bottom and soy dipping sauce.', restaurantId: 'r4', category: 'Sides'),
       // Drinks
-      MenuItem(id: 'm39', name: 'Matcha Latte', imageUrl: '$_p/matcha-latte/400/300', price: 6.49, description: 'Creamy ceremonial-grade matcha whisked with steamed milk.', restaurantId: 'r4', category: 'Drinks'),
-      MenuItem(id: 'm40', name: 'Calpis Soda', imageUrl: '$_p/calpis-soda/400/300', price: 4.99, description: 'Refreshing Japanese yogurt-flavoured carbonated drink.', restaurantId: 'r4', category: 'Drinks'),
+      MenuItem(id: 'm39', name: 'Matcha Latte', imageUrl: '$_u/photo-1661756522906-5df7ee690868?w=400&fit=crop', price: 6.49, description: 'Creamy ceremonial-grade matcha whisked with steamed milk.', restaurantId: 'r4', category: 'Drinks'),
+      MenuItem(id: 'm40', name: 'Calpis Soda', imageUrl: '$_u/photo-1604259596747-2377448d916d?w=400&fit=crop', price: 4.99, description: 'Refreshing Japanese yogurt-flavoured carbonated drink.', restaurantId: 'r4', category: 'Drinks'),
     ],
 
     // ── Burger Joint (American) ──
@@ -147,13 +147,13 @@ class FoodDeliveryLocalDatasource {
       MenuItem(id: 'm43', name: 'Chicken Wings', imageUrl: '$_m/4hzyvq1763792564.jpg', price: 12.49, description: 'Crispy buffalo wings served with ranch dipping sauce.', restaurantId: 'r5', category: 'Mains'),
       MenuItem(id: 'm44', name: 'Mushroom Swiss Burger', imageUrl: '$_f/burger/burger35.jpg', price: 13.99, description: 'Sauteed mushrooms and melted Swiss cheese on a chargrilled patty.', restaurantId: 'r5', category: 'Mains'),
       // Sides
-      MenuItem(id: 'm45', name: 'Loaded Fries', imageUrl: '$_p/loaded-fries/400/300', price: 9.49, description: 'Crispy fries topped with cheese sauce, bacon bits, and jalapeños.', restaurantId: 'r5', category: 'Sides'),
-      MenuItem(id: 'm46', name: 'Onion Rings', imageUrl: '$_p/onion-rings/400/300', price: 7.99, description: 'Beer-battered onion rings fried golden, served with ketchup.', restaurantId: 'r5', category: 'Sides'),
-      MenuItem(id: 'm47', name: 'Coleslaw', imageUrl: '$_p/coleslaw/400/300', price: 5.49, description: 'Creamy cabbage and carrot slaw with a tangy dressing.', restaurantId: 'r5', category: 'Sides'),
+      MenuItem(id: 'm45', name: 'Loaded Fries', imageUrl: '$_u/photo-1683861800944-0ffaf3ef9b13?w=400&fit=crop', price: 9.49, description: 'Crispy fries topped with cheese sauce, bacon bits, and jalapeños.', restaurantId: 'r5', category: 'Sides'),
+      MenuItem(id: 'm46', name: 'Onion Rings', imageUrl: '$_u/photo-1683121324272-90f4b4084ac9?w=400&fit=crop', price: 7.99, description: 'Beer-battered onion rings fried golden, served with ketchup.', restaurantId: 'r5', category: 'Sides'),
+      MenuItem(id: 'm47', name: 'Coleslaw', imageUrl: '$_u/photo-1692781059226-cd75729787b6?w=400&fit=crop', price: 5.49, description: 'Creamy cabbage and carrot slaw with a tangy dressing.', restaurantId: 'r5', category: 'Sides'),
       // Drinks
-      MenuItem(id: 'm48', name: 'Milkshake', imageUrl: '$_p/milkshake/400/300', price: 8.49, description: 'Thick and creamy vanilla milkshake with whipped cream.', restaurantId: 'r5', category: 'Drinks'),
-      MenuItem(id: 'm49', name: 'Root Beer Float', imageUrl: '$_p/root-beer-float/400/300', price: 6.99, description: 'Classic root beer with a scoop of vanilla ice cream.', restaurantId: 'r5', category: 'Drinks'),
-      MenuItem(id: 'm50', name: 'Lemonade', imageUrl: '$_p/lemonade/400/300', price: 4.49, description: 'Freshly squeezed lemonade with a hint of mint.', restaurantId: 'r5', category: 'Drinks'),
+      MenuItem(id: 'm48', name: 'Milkshake', imageUrl: '$_u/photo-1695868328902-b8a3b093da74?w=400&fit=crop', price: 8.49, description: 'Thick and creamy vanilla milkshake with whipped cream.', restaurantId: 'r5', category: 'Drinks'),
+      MenuItem(id: 'm49', name: 'Root Beer Float', imageUrl: '$_u/photo-1676979223440-e97aa94f9b12?w=400&fit=crop', price: 6.99, description: 'Classic root beer with a scoop of vanilla ice cream.', restaurantId: 'r5', category: 'Drinks'),
+      MenuItem(id: 'm50', name: 'Lemonade', imageUrl: '$_u/photo-1664391804722-cb3f2d439d7f?w=400&fit=crop', price: 4.49, description: 'Freshly squeezed lemonade with a hint of mint.', restaurantId: 'r5', category: 'Drinks'),
     ],
 
     // ── Spice Route (Indian) ──
@@ -164,13 +164,13 @@ class FoodDeliveryLocalDatasource {
       MenuItem(id: 'm53', name: 'Palak Paneer', imageUrl: '$_m/xxpqsy1511452222.jpg', price: 13.99, description: 'Creamy spinach curry with cubes of soft Indian cottage cheese.', restaurantId: 'r6', category: 'Mains'),
       MenuItem(id: 'm54', name: 'Chicken Tikka Masala', imageUrl: '$_m/qptpvt1487339892.jpg', price: 16.49, description: 'Chargrilled chicken chunks in a velvety spiced tomato and cream sauce.', restaurantId: 'r6', category: 'Mains'),
       // Sides
-      MenuItem(id: 'm55', name: 'Garlic Naan', imageUrl: '$_p/garlic-naan/400/300', price: 4.49, description: 'Soft tandoori bread brushed with garlic butter.', restaurantId: 'r6', category: 'Sides'),
+      MenuItem(id: 'm55', name: 'Garlic Naan', imageUrl: '$_u/photo-1675040830173-52fc937ec2d2?w=400&fit=crop', price: 4.49, description: 'Soft tandoori bread brushed with garlic butter.', restaurantId: 'r6', category: 'Sides'),
       MenuItem(id: 'm56', name: 'Samosa', imageUrl: '$_f/samosa/samosa10.jpg', price: 7.99, description: 'Crispy pastry filled with spiced potatoes and peas.', restaurantId: 'r6', category: 'Sides'),
-      MenuItem(id: 'm57', name: 'Raita', imageUrl: '$_p/raita/400/300', price: 3.99, description: 'Cool yogurt dip with cucumber, mint, and cumin.', restaurantId: 'r6', category: 'Sides'),
+      MenuItem(id: 'm57', name: 'Raita', imageUrl: '$_u/photo-1694141252779-7e81df0d7c12?w=400&fit=crop', price: 3.99, description: 'Cool yogurt dip with cucumber, mint, and cumin.', restaurantId: 'r6', category: 'Sides'),
       // Drinks
-      MenuItem(id: 'm58', name: 'Mango Lassi', imageUrl: '$_p/mango-lassi/400/300', price: 5.99, description: 'Refreshing yogurt-based drink blended with sweet mango.', restaurantId: 'r6', category: 'Drinks'),
-      MenuItem(id: 'm59', name: 'Masala Chai', imageUrl: '$_p/masala-chai/400/300', price: 4.49, description: 'Spiced Indian tea brewed with cardamom, ginger, and cinnamon.', restaurantId: 'r6', category: 'Drinks'),
-      MenuItem(id: 'm60', name: 'Rose Lemonade', imageUrl: '$_p/rose-lemonade/400/300', price: 5.49, description: 'Sparkling lemonade infused with fragrant rose water.', restaurantId: 'r6', category: 'Drinks'),
+      MenuItem(id: 'm58', name: 'Mango Lassi', imageUrl: '$_u/photo-1675720665451-77813f0ecb89?w=400&fit=crop', price: 5.99, description: 'Refreshing yogurt-based drink blended with sweet mango.', restaurantId: 'r6', category: 'Drinks'),
+      MenuItem(id: 'm59', name: 'Masala Chai', imageUrl: '$_u/photo-1671379526961-1aebb82b317b?w=400&fit=crop', price: 4.49, description: 'Spiced Indian tea brewed with cardamom, ginger, and cinnamon.', restaurantId: 'r6', category: 'Drinks'),
+      MenuItem(id: 'm60', name: 'Rose Lemonade', imageUrl: '$_u/photo-1728485298512-1d7bf2baf043?w=400&fit=crop', price: 5.49, description: 'Sparkling lemonade infused with fragrant rose water.', restaurantId: 'r6', category: 'Drinks'),
     ],
   };
 
