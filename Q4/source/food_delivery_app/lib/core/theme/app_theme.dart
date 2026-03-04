@@ -49,11 +49,14 @@ class AppTheme {
         ),
       ),
       snackBarTheme: SnackBarThemeData(
-        backgroundColor: _surfaceColor,
-        contentTextStyle: GoogleFonts.poppins(color: Colors.white),
+        backgroundColor: primaryColor,
+        contentTextStyle: GoogleFonts.poppins(
+          color: Colors.black,
+          fontWeight: FontWeight.w500,
+        ),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(10),
         ),
       ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
