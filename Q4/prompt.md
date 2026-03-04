@@ -79,3 +79,18 @@
 > - **Image memory capping:** Add `memCacheWidth` / `memCacheHeight` to every `CachedNetworkImage` — sized to the widget's logical pixel dimensions (e.g. 400×180 for restaurant cards, 90×90 for menu thumbnails, 70×70 for cart thumbnails, 600×220 for hero image). This prevents the image cache from storing full-resolution bitmaps.
 > - **Global image cache tuning:** In `main.dart`, after `WidgetsFlutterBinding.ensureInitialized()`, set `PaintingBinding.instance.imageCache.maximumSize = 50` and `maximumSizeBytes = 50 << 20` (50 MB) to cap memory on constrained devices.
 > - **Remove `IntrinsicHeight`:** Replace `IntrinsicHeight` in `OrderStatusStepper` with a fixed-height `SizedBox` (80px per step, 56px for the last step) to avoid expensive multi-pass layout on every status change.
+
+### Prompt 4 — Branding (RushTrail Eats)
+
+> Rebrand the app to "RushTrail Eats" to match Q5's RushTrail brand identity:
+>
+> - Rename `android:label` in AndroidManifest.xml to "RushTrail Eats"
+> - Set `CFBundleDisplayName` and `CFBundleName` in iOS Info.plist to "RushTrail Eats"
+> - Update `AppConstants.appName` and wire it into `MaterialApp title` and the AppBar title
+> - Add a custom app icon using the shared RushTrail owl logo (`assets/icon/app_icon.png`, copied from Q5)
+> - Add `flutter_launcher_icons: ^0.14.3` to dev_dependencies and configure it to generate Android adaptive icons (black background) and iOS icons
+> - Run `dart run flutter_launcher_icons` to generate all platform icon assets
+
+### Prompt 5 — Food-Matched Images
+
+> Replace all `picsum.photos/seed/` placeholder image URLs in the local datasource with real food-matched photos from Unsplash. Each of the 29 non-API menu items should use an Unsplash direct URL (`https://images.unsplash.com/photo-{ID}?w=400&fit=crop`) where the photo actually depicts the named dish. Keep the existing Foodish API and TheMealDB URLs unchanged.

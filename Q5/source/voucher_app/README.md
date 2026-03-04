@@ -1,16 +1,39 @@
-# voucher_app
+# RushTrail Voucher
 
-A new Flutter project.
+A Flutter voucher selection and QR code payment app built with clean architecture, flutter_bloc (Cubit), and get_it.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+```bash
+flutter pub get
+flutter run
+```
 
-A few resources to get you started if this is your first Flutter project:
+## Architecture
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+```
+lib/
+├── main.dart
+├── app.dart
+├── core/
+│   ├── constants/app_constants.dart
+│   └── theme/app_theme.dart
+├── di/injection.dart
+└── features/voucher/
+    ├── domain/
+    │   ├── entities/
+    │   ├── repositories/
+    │   └── usecases/
+    ├── data/
+    │   ├── datasources/
+    │   └── repositories/
+    └── presentation/
+        ├── cubit/
+        ├── screens/
+        └── widgets/
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Screens
+
+1. **Voucher List** — Select from $2, $5, and $10 vouchers in a 2-column grid
+2. **QR Code** — Displays payment QR code with 5-minute countdown timer and payment summary

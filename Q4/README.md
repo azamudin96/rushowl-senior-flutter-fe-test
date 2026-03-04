@@ -2,7 +2,7 @@
 
 ## Approach
 
-This app was generated using Claude (Anthropic) with two iterative prompts. The first prompt established the complete app scaffold with clean architecture, all entities, state management, screens, and mock data. The second prompt refined visual polish and UI interactions.
+This app was generated using Claude (Anthropic) with five iterative prompts. The first prompt established the complete app scaffold with clean architecture, all entities, state management, screens, and mock data. The second prompt refined visual polish and UI interactions. The third applied performance optimisations from Q1/Q2. The fourth rebranded the app to "RushTrail Eats" with a custom app icon. The fifth replaced placeholder images with food-matched Unsplash photos.
 
 ### Architecture
 
@@ -23,12 +23,25 @@ This app was generated using Claude (Anthropic) with two iterative prompts. The 
 
 5. **BlocSelector for CartBadge** — Rebuilds only when `itemCount` changes, not on every cart state mutation (e.g., quantity changes don't cause unnecessary AppBar rebuilds).
 
+### Branding
+
+- **App name:** RushTrail Eats (shared RushTrail brand identity with Q5)
+- **App icon:** Custom RushTrail owl logo (black background, gold owl + text), generated via `flutter_launcher_icons` for both Android (adaptive) and iOS
+- **Theme:** Black + gold (#FFB800) dark theme with Poppins font
+
+### Food Images
+
+All menu item images are real food photos sourced from:
+- **Foodish API** — burgers, pizza, pasta, biryani, dessert
+- **TheMealDB** — specific dishes (Pad Thai, Kung Pao Chicken, etc.)
+- **Unsplash** — 29 remaining items matched by dish name (garlic bread, bruschetta, miso soup, matcha latte, etc.)
+
 ### Screens
 
 | Screen | Description |
 |---|---|
 | Restaurant List | Browse 6 restaurants with image cards, ratings, delivery info |
-| Food Menu | Restaurant header + scrollable menu items with "Add to Cart" |
+| Food Menu | Hero image with overlapping info card, category filter chips, scrollable menu items with "Add to Cart" |
 | Checkout | Cart items with +/- quantity, price breakdown, "Place Order" |
 | Order Tracking | Auto-advancing status stepper (confirmed → preparing → on the way → delivered) |
 
@@ -42,6 +55,7 @@ This app was generated using Claude (Anthropic) with two iterative prompts. The 
 | google_fonts ^8.0.2 | Poppins font family |
 | cached_network_image ^3.4.1 | Image loading with caching and placeholders |
 | intl ^0.19.0 | Currency formatting |
+| flutter_launcher_icons ^0.14.3 | App icon generation (dev dependency) |
 
 ### Running
 
@@ -59,7 +73,7 @@ These patterns were developed during Q1 (list rendering optimisation) and Q2 (lo
 |---|---|---|
 | `RepaintBoundary` on list tiles | Q1 | `RestaurantCard`, `MenuItemCard`, `CartItemTile` |
 | `cacheExtent: 500` on scroll views | Q1 | `RestaurantListScreen` ListView, `FoodMenuScreen` CustomScrollView |
-| `memCacheWidth`/`memCacheHeight` on images | Q1 + Q2 | All `CachedNetworkImage` widgets (400×180, 90×90, 70×70, 600×220) |
+| `memCacheWidth`/`memCacheHeight` on images | Q1 + Q2 | All `CachedNetworkImage` widgets (400×180, 90×90, 70×70, hero: width-only 600) |
 | Global image cache cap (50 entries / 50 MB) | Q2 | `main.dart` |
 | Replace `IntrinsicHeight` with fixed `SizedBox` | Q2 | `OrderStatusStepper` (avoids expensive multi-pass layout) |
 

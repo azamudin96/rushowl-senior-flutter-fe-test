@@ -1,16 +1,47 @@
-# food_delivery_app
+# RushTrail Eats
 
-A new Flutter project.
+A Flutter food delivery app built with clean architecture, flutter_bloc (Cubit), and get_it.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+```bash
+flutter pub get
+flutter run
+```
 
-A few resources to get you started if this is your first Flutter project:
+## Architecture
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+```
+lib/
+├── main.dart
+├── app.dart
+├── core/
+│   ├── constants/app_constants.dart
+│   └── theme/app_theme.dart
+├── di/injection.dart
+└── features/food_delivery/
+    ├── domain/
+    │   ├── entities/
+    │   ├── repositories/
+    │   └── usecases/
+    ├── data/
+    │   ├── datasources/
+    │   └── repositories/
+    └── presentation/
+        ├── cubit/
+        ├── screens/
+        └── widgets/
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Screens
+
+1. **Restaurant List** — Browse 6 restaurants with ratings and delivery info
+2. **Food Menu** — Hero image, category filters, menu items with "Add to Cart"
+3. **Checkout** — Cart items with quantity controls, price breakdown
+4. **Order Tracking** — Auto-advancing status stepper
+
+## Generating App Icons
+
+```bash
+dart run flutter_launcher_icons
+```
