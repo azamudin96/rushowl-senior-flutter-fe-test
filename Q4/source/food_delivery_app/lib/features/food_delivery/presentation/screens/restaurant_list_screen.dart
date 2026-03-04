@@ -41,7 +41,7 @@ class _RestaurantListViewState extends State<_RestaurantListView> {
           icon: const Icon(Icons.menu),
         ),
         title: const Text(
-          'Food Delivery',
+          'RushTrail Eats',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: const [CartBadge()],
@@ -222,6 +222,7 @@ class _RestaurantList extends StatelessWidget {
     }
 
     return ListView.builder(
+      cacheExtent: 500,
       padding: const EdgeInsets.only(top: 8, bottom: 16),
       itemCount: restaurants.length,
       itemBuilder: (context, index) {
