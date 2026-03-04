@@ -94,3 +94,21 @@
 ### Prompt 5 — Food-Matched Images
 
 > Replace all `picsum.photos/seed/` placeholder image URLs in the local datasource with real food-matched photos from Unsplash. Each of the 29 non-API menu items should use an Unsplash direct URL (`https://images.unsplash.com/photo-{ID}?w=400&fit=crop`) where the photo actually depicts the named dish. Keep the existing Foodish API and TheMealDB URLs unchanged.
+
+### Prompt 6 — Help & Support Screen
+
+> Add a Help & Support screen accessible from the `?` icon on the Order Tracking screen:
+>
+> - **Navigation:** Wrap the existing help icon in a `GestureDetector`. On tap, read the current `OrderCubit` state; if `OrderTracking`, push `HelpSupportScreen(order: order)`.
+> - **AppBar:** Back arrow + "Help & Support" title centered.
+> - **Order info card:** First item's image (56×56, `CachedNetworkImage` with `memCacheWidth`/`memCacheHeight: 56`), order number, item count summary, status badge (gold pill using `OrderStatus.displayName`). Wrapped in `RepaintBoundary`.
+> - **Search bar:** Decorative — search icon + "Search for help" placeholder.
+> - **Common Issues section** — 4 tappable rows (each wrapped in `RepaintBoundary`):
+>   - "Where is my order?" (blue `location_on` icon)
+>   - "Change delivery address" (purple `edit_location_alt` icon)
+>   - "Cancel order" (red `cancel` icon)
+>   - "Report a quality issue" (gold `report_problem` icon)
+> - **Other section** — "View FAQ" and "Terms of Service" rows.
+> - **Bottom sticky button:** "Chat with Support" gold `FilledButton.icon` with chat icon.
+> - All items are decorative/non-functional (UI-only demo).
+> - Follow existing performance patterns: `RepaintBoundary` on card/row widgets, `memCacheWidth`/`memCacheHeight` on images, `const` constructors where possible, `Theme.of(context)` inside `build()` (not passed as constructor param).
