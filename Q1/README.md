@@ -1,46 +1,44 @@
 # Q1 — Flutter List Rendering Optimisation
 
-This directory contains two Flutter projects demonstrating the performance difference between a **naive** and an **optimised** approach to rendering a vertically scrollable list of 1,000 network images.
+Two Flutter projects demonstrating the performance difference between a **naive** and an **optimised** approach to rendering a vertically scrollable list of 1,000 network images.
 
-Both projects load images from `https://picsum.photos/seed/{index}/600/400` with identical tile dimensions (height: 200, BoxFit.cover) for a fair comparison.
+Both load images from `https://picsum.photos/seed/{index}/600/400` with identical tile dimensions (height: 200, BoxFit.cover) for a fair comparison.
 
 ## Problems with the Naive Approach
 
-The naive implementation (`naive/`) uses `SingleChildScrollView` with a `Column` containing all 1,000 image widgets. This forces Flutter to build, lay out, and keep in memory every single widget on the very first frame — even though only ~5 are visible at a time. The result is a massive initial build time and a large memory footprint that climbs as images decode.
+The naive implementation (`naive/`) uses `SingleChildScrollView` with a `Column` containing all 1,000 image widgets. Flutter builds, lays out, and retains every widget on the first frame — even though only ~5 are visible. This causes a massive initial build time and rapidly climbing memory.
 
-Raw `Image.network()` provides no caching. When a user scrolls down and then back up, previously loaded images are re-downloaded and re-decoded from scratch, wasting bandwidth and CPU. There are no placeholders or error widgets, so users see blank space that suddenly pops in — a poor loading experience. No `const` constructors are used anywhere, so every rebuild creates fresh widget instances that the framework cannot short-circuit — compounding the cost of already building 1,000 widgets eagerly.
-
-Note: the naive version deliberately keeps the same fixed tile height (200) and `BoxFit.cover` as the optimised version for a fair apples-to-apples comparison. In a truly unconstrained naive implementation, removing fixed dimensions would add layout thrash on top of everything else.
+Raw `Image.network()` provides no caching; scrolling back re-downloads and re-decodes images from scratch. There are no placeholders, so users see blank space that suddenly pops in. No `const` constructors are used, so every rebuild creates fresh widget instances the framework cannot short-circuit.
 
 ## Techniques Applied in the Optimised Version
 
 The optimised implementation (`optimised/`) applies several targeted fixes:
 
-- **`ListView.builder` with `itemExtent: 200`** — Only builds widgets currently in or near the viewport (~5–7 at a time). The fixed `itemExtent` lets the framework skip per-item layout measurement entirely, making scrolling calculations O(1).
-- **`addAutomaticKeepAlives: false`** — Prevents the list from retaining off-screen widget state. In this scenario (1,000 images with `cached_network_image` handling caching), we don't need the framework to keep disposed tiles alive — the image cache already handles re-display efficiently. This reduces memory retention during long scrolls.
-- **`addRepaintBoundaries: false`** — Disabled because each `ImageTile` already wraps itself in a `RepaintBoundary`. Keeping the list's default would double-wrap every tile, adding unnecessary layer overhead. Choose one or the other — not both.
-- **`cacheExtent: 1200`** — Prefetches ~6 extra tiles (at 200px each) beyond the visible viewport. This reduces blank tiles during fast scrolling by giving images a head start on loading before they enter view.
-- **`cached_network_image` package** — Caches decoded images in memory (and on disk where the platform supports it). Scrolling back to a previously viewed image is instant — no re-download or re-decode.
-- **`memCacheWidth` / `memCacheHeight` computed from `MediaQuery`** — Decodes images at the actual display pixel size (`logicalWidth × devicePixelRatio`), not the source resolution. This avoids wasting memory on pixels that will be downscaled by the GPU anyway. Hardcoding source dimensions (e.g. 600×400) misses this optimisation entirely.
-- **`RepaintBoundary`** — Wraps each tile so that fade-in transitions only repaint their own tile, not the entire list.
-- **Static `ColoredBox` placeholder** — Avoids the cost of per-tile `CircularProgressIndicator` animations. With ~5–7 tiles loading simultaneously, animated spinners cause continuous repaints on every frame. A static grey box is virtually free.
-- **`const` constructors** — Used wherever possible to allow Flutter's widget reconciliation to short-circuit rebuilds.
+- **`ListView.builder` with `itemExtent: 200`** — Builds only visible widgets (~5–7). Fixed `itemExtent` makes scroll calculations O(1).
+- **`addAutomaticKeepAlives: false`** — Prevents retaining off-screen widget state; the image cache handles re-display.
+- **`addRepaintBoundaries: false`** — Each `ImageTile` already wraps itself in a `RepaintBoundary`, so the list's default is disabled to avoid double-wrapping.
+- **`cacheExtent: 1200`** — Prefetches ~6 extra tiles beyond the viewport, giving images a head start before entering view.
+- **`cached_network_image`** — Memory and disk caching. Scrolling back is instant — no re-download.
+- **`memCacheWidth` / `memCacheHeight` from `MediaQuery`** — Decodes at display pixel size (`logicalWidth × devicePixelRatio`), avoiding wasted memory on downscaled pixels.
+- **`RepaintBoundary`** — Per-tile isolation so fade-in transitions repaint only their own tile.
+- **Static `ColoredBox` placeholder** — Avoids per-tile `CircularProgressIndicator` animations that cause continuous repaints across ~5–7 loading tiles.
+- **`const` constructors** — Allows Flutter's reconciliation to short-circuit rebuilds.
 
-## Expected Behaviour Comparison
+## Expected Behaviour
 
 | Metric | Naive | Optimised |
 |---|---|---|
-| Initial build | Slow — builds 1,000 widgets | Fast — builds ~5 visible widgets |
-| Memory | Climbs rapidly, frequent GC | Stable, bounded by cache limits |
+| Initial build | Builds 1,000 widgets | Builds ~5 visible widgets |
+| Memory | Climbs rapidly, frequent GC | Stable, bounded by cache |
 | Scroll performance | Jank, frame drops | Smooth 60 fps |
 | Re-visit images | Re-downloads from network | Served from memory cache |
-| Loading UX | Blank space, sudden pop-in | Static placeholder, smooth fade-in |
+| Loading UX | Blank pop-in | Placeholder, smooth fade-in |
 
 ## What to Measure in DevTools
 
-- **Frame chart** — Look for UI and GPU jank spikes. The naive version will show frequent spikes above the 16 ms budget; the optimised version should stay consistently below it.
-- **Raster thread** — Monitor spike frequency during fast scrolling. High frequency in naive, rare in optimised.
-- **Memory tab** — Compare heap growth patterns. Naive shows a steadily climbing sawtooth (allocate → GC → allocate); optimised shows a flat plateau once the visible cache is warm.
+- **Frame chart** — Naive shows frequent spikes above the 16ms budget; optimised stays below.
+- **Raster thread** — High spike frequency in naive, rare in optimised.
+- **Memory tab** — Naive shows a climbing sawtooth (allocate → GC → allocate); optimised shows a flat plateau once the cache is warm.
 
 ## Running
 
@@ -52,4 +50,4 @@ cd naive && flutter run
 cd optimised && flutter run
 ```
 
-Open DevTools (press `d` in the terminal) to compare performance profiles side by side.
+Open DevTools (press `d` in the terminal) to compare performance profiles.
