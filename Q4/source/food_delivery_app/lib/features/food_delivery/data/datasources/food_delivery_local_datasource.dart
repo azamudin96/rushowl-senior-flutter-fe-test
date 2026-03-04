@@ -1,4 +1,6 @@
+import '../../domain/entities/cart_item.dart';
 import '../../domain/entities/menu_item.dart';
+import '../../domain/entities/order_history_item.dart';
 import '../../domain/entities/restaurant.dart';
 
 class FoodDeliveryLocalDatasource {
@@ -182,5 +184,94 @@ class FoodDeliveryLocalDatasource {
   Future<List<MenuItem>> getMenuItems(String restaurantId) async {
     await Future.delayed(_delay);
     return _menuItems[restaurantId] ?? [];
+  }
+
+  Future<List<Restaurant>> searchRestaurants(String query) async {
+    await Future.delayed(_delay);
+    final q = query.toLowerCase();
+    return _restaurants.where((r) {
+      return r.name.toLowerCase().contains(q) ||
+          r.cuisineType.toLowerCase().contains(q);
+    }).toList();
+  }
+
+  Future<List<MenuItem>> searchAllMenuItems(String query) async {
+    await Future.delayed(_delay);
+    final q = query.toLowerCase();
+    return _menuItems.values.expand((items) => items).where((item) {
+      return item.name.toLowerCase().contains(q) ||
+          item.description.toLowerCase().contains(q) ||
+          item.category.toLowerCase().contains(q);
+    }).toList();
+  }
+
+  Future<List<OrderHistoryItem>> getOrderHistory() async {
+    await Future.delayed(_delay);
+    final now = DateTime.now();
+    final r5 = _restaurants[4]; // Burger Joint
+    final r1 = _restaurants[0]; // Pizza Palace
+    final r6 = _restaurants[5]; // Spice Route
+    final r5Items = _menuItems['r5']!;
+    final r1Items = _menuItems['r1']!;
+    final r6Items = _menuItems['r6']!;
+
+    return [
+      OrderHistoryItem(
+        id: 'ORD-001',
+        restaurantName: r5.name,
+        restaurantImageUrl: r5.imageUrl,
+        date: now,
+        status: OrderHistoryStatus.inProgress,
+        itemsSummary: '1x Classic Cheeseburger, 1x Loaded Fries, 1x Milkshake',
+        total: 29.97,
+        restaurant: r5,
+        cartItems: [
+          CartItem(menuItem: r5Items[0], quantity: 1), // Classic Cheeseburger
+          CartItem(menuItem: r5Items[4], quantity: 1), // Loaded Fries
+          CartItem(menuItem: r5Items[7], quantity: 1), // Milkshake
+        ],
+      ),
+      OrderHistoryItem(
+        id: 'ORD-002',
+        restaurantName: r1.name,
+        restaurantImageUrl: r1.imageUrl,
+        date: now.subtract(const Duration(days: 2)),
+        status: OrderHistoryStatus.delivered,
+        itemsSummary: '2x Margherita Pizza, 1x Garlic Bread',
+        total: 34.47,
+        restaurant: r1,
+        cartItems: [
+          CartItem(menuItem: r1Items[0], quantity: 2), // Margherita Pizza
+          CartItem(menuItem: r1Items[5], quantity: 1), // Garlic Bread
+        ],
+      ),
+      OrderHistoryItem(
+        id: 'ORD-003',
+        restaurantName: r6.name,
+        restaurantImageUrl: r6.imageUrl,
+        date: now.subtract(const Duration(days: 5)),
+        status: OrderHistoryStatus.delivered,
+        itemsSummary: '1x Butter Chicken, 1x Mango Lassi',
+        total: 21.98,
+        restaurant: r6,
+        cartItems: [
+          CartItem(menuItem: r6Items[0], quantity: 1), // Butter Chicken
+          CartItem(menuItem: r6Items[7], quantity: 1), // Mango Lassi
+        ],
+      ),
+      OrderHistoryItem(
+        id: 'ORD-004',
+        restaurantName: r5.name,
+        restaurantImageUrl: r5.imageUrl,
+        date: now.subtract(const Duration(days: 7)),
+        status: OrderHistoryStatus.cancelled,
+        itemsSummary: '1x Classic Cheeseburger',
+        total: 11.99,
+        restaurant: r5,
+        cartItems: [
+          CartItem(menuItem: r5Items[0], quantity: 1), // Classic Cheeseburger
+        ],
+      ),
+    ];
   }
 }
