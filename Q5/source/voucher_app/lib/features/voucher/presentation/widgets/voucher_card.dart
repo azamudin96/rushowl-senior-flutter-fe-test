@@ -25,7 +25,8 @@ class VoucherCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isSelected = voucher.isSelected;
 
-    return GestureDetector(
+    return RepaintBoundary(
+      child: GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
@@ -108,6 +109,7 @@ class VoucherCard extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }

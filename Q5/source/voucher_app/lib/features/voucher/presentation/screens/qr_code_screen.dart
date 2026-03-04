@@ -41,6 +41,15 @@ class QrCodeScreen extends StatelessWidget {
           Navigator.of(context).pop();
         },
         child: BlocBuilder<VoucherCubit, VoucherState>(
+        // Only rebuild when non-timer fields change (Q2 optimisation)
+        buildWhen: (prev, curr) {
+          if (prev is VoucherLoaded && curr is VoucherLoaded) {
+            return prev.vouchers != curr.vouchers ||
+                prev.totalAmount != curr.totalAmount ||
+                prev.qrContent != curr.qrContent;
+          }
+          return true;
+        },
         builder: (context, state) {
           if (state is! VoucherLoaded || !state.hasSelection) {
             return Center(
@@ -261,7 +270,7 @@ class QrCodeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              // Sticky bottom: Cancel button + Expiry text
+              // Sticky bottom: Cancel button + Expiry countdown (Q2: isolated via BlocSelector)
               Container(
                 decoration: const BoxDecoration(
                   color: AppColors.surfaceDark,
@@ -300,15 +309,8 @@ class QrCodeScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Text(
-                      'This QR code will expire in ${state.formattedTime}',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: state.remainingSeconds <= 60
-                            ? const Color(0xFFEF4444)
-                            : const Color(0xFF94A3B8),
-                      ),
-                    ),
+                    // BlocSelector: only rebuilds this Text on remainingSeconds change
+                    const _CountdownText(),
                   ],
                 ),
               ),
@@ -317,6 +319,36 @@ class QrCodeScreen extends StatelessWidget {
         },
         ),
       ),
+    );
+  }
+}
+
+/// Isolated countdown widget — only rebuilds when remainingSeconds changes,
+/// preventing the entire QR code + payment summary from rebuilding every second (Q2).
+class _CountdownText extends StatelessWidget {
+  const _CountdownText();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<VoucherCubit, VoucherState, (String, int)>(
+      selector: (state) {
+        if (state is VoucherLoaded) {
+          return (state.formattedTime, state.remainingSeconds);
+        }
+        return ('--:--', 0);
+      },
+      builder: (context, data) {
+        final (formattedTime, remainingSeconds) = data;
+        return Text(
+          'This QR code will expire in $formattedTime',
+          style: TextStyle(
+            fontSize: 12,
+            color: remainingSeconds <= 60
+                ? const Color(0xFFEF4444)
+                : const Color(0xFF94A3B8),
+          ),
+        );
+      },
     );
   }
 }

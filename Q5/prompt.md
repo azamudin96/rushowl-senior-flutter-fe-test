@@ -39,6 +39,18 @@
 
 > Refine the voucher card widget:
 > - Use different Material icons per denomination ($2 → confirmation_number, $5 → local_activity, $10 → redeem).
-> - Show a green checkmark overlay when selected.
+> - Show a primary-coloured (yellow) checkmark circle overlay when selected.
 > - Animate the border colour and background on selection with a 200 ms duration.
-> - Display the voucher display number (e.g. #8812) below the amount.
+> - Display the voucher display number (e.g. "Voucher 8812") below the amount.
+
+---
+
+## Prompt 4 — Performance Optimisation (Q1/Q2 learnings applied)
+
+> Apply the performance patterns I developed in Q1 (list rendering) and Q2 (low-end device essay) to this app:
+>
+> **From Q1 — List Rendering Optimisation:**
+> - Wrap each `VoucherCard` in `RepaintBoundary` so that selection animation on one card does not repaint the entire grid.
+>
+> **From Q2 — Low-End Device Performance:**
+> - The QR code screen uses a `BlocBuilder` that rebuilds the entire widget tree (QR code, payment summary, header) every second when the countdown timer ticks. Extract the countdown text into a separate `_CountdownText` widget using `BlocSelector` that selects only `remainingSeconds`. Add `buildWhen` to the main `BlocBuilder` to skip timer-only state changes. This way the heavy QR code and payment summary widgets are not rebuilt every second.

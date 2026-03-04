@@ -64,6 +64,16 @@ flutter pub get
 flutter run            # or: flutter run -d chrome
 ```
 
+### Performance Optimisations (from Q1 & Q2)
+
+These patterns were developed during Q1 (list rendering optimisation) and Q2 (low-end device essay), then applied here:
+
+| Technique | Source | Where Applied |
+|---|---|---|
+| `RepaintBoundary` on grid tiles | Q1 | `VoucherCard` — prevents selection animation repainting the entire grid |
+| `BlocSelector` for countdown timer | Q2 | `_CountdownText` widget — isolates per-second rebuilds from the QR code + payment summary |
+| `buildWhen` on main `BlocBuilder` | Q2 | `QrCodeScreen` — skips timer-only state changes for the heavy widget tree |
+
 ### QR Code Content Format
 
 When vouchers are selected, the QR code encodes a **comma-separated list of the selected voucher amounts**, sorted ascending. For example, selecting 2x $2 and 1x $10 produces the QR string `2,2,10`, and the screen displays a total of `$14.00`.
