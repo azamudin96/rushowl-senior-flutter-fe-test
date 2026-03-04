@@ -73,3 +73,86 @@ Each frame must complete within 16.67ms to avoid jank:
 | Layout | IntrinsicHeight, multiple passes | Fixed dimensions, simpler structures |
 | Paint | Large images, Opacity/saveLayer | cacheWidth, widget swap instead of Opacity |
 | Composite | Shader compilation (first run) | SkSL warmup, Impeller |
+
+## 4. Performance Overlay Interpretation
+
+The Performance Overlay shows two real-time graphs directly on-device:
+
+```
+┌───────────────────────────────┐
+│  UI thread  ▁▂▁▃▁▁▂▁  (top)  │  ← Build + Layout
+│  Raster     ▁▁▂▁▁▁▁▁  (bot)  │  ← Paint + Composite (GPU)
+└───────────────────────────────┘
+        GREEN = within 16ms budget
+        RED   = exceeding budget (jank)
+```
+
+| Bar | Red Means | Likely Cause | Fix |
+|---|---|---|---|
+| UI (top) | Build or layout too slow | Deep widget trees, unnecessary rebuilds | Scoped state, const constructors |
+| Raster (bottom) | Paint or GPU too slow | Large images, saveLayer, shader compile | cacheWidth, RepaintBoundary, SkSL warmup |
+| Both | Frame completely blown | Multiple issues compounding | Profile each phase in DevTools |
+
+Enable via `WidgetsApp.showPerformanceOverlay: true` or press `P` in the terminal during `flutter run --profile`.
+
+## 5. Tree-Shaking & Deferred Loading
+
+How Dart's tree-shaking and deferred components reduce binary size:
+
+```
+Full app bundle (no optimization)
+┌──────────────────────────────────────────┐
+│  Core   │  Feature A  │  Feature B  │ Dead│  12 MB
+└──────────────────────────────────────────┘
+
+After tree-shaking (release mode)
+┌────────────────────────────────────┐
+│  Core   │  Feature A  │  Feature B │         10 MB (-17%)
+└────────────────────────────────────┘
+  Dead code removed automatically
+
+After deferred components
+┌────────────────────┐  ┌───────────┐
+│  Core  │ Feature A │  │ Feature B │          7 MB initial + 3 MB on demand
+└────────────────────┘  └───────────┘
+  Initial download        Loaded when needed
+```
+
+```dart
+// Deferred loading example
+import 'package:app/features/reports.dart' deferred as reports;
+
+Future<void> openReports() async {
+  await reports.loadLibrary();
+  reports.showReportScreen();
+}
+```
+
+**Impact on low-end devices:** Smaller initial binary means faster install, less storage used, and quicker cold start — critical on devices with 16–32 GB storage shared with the OS.
+
+## 6. SkSL Shader Warm-Up Pipeline
+
+How pre-compiled shaders eliminate first-run jank:
+
+```
+WITHOUT warm-up:
+  App launch → first animation → shader compile (stutter!) → smooth after
+
+WITH warm-up:
+  Test run → capture SkSL → bundle into APK → App launch → smooth from start
+```
+
+Steps:
+
+```bash
+# 1. Run app and exercise all animations
+flutter run --profile --cache-sksl --purge-persistent-cache
+
+# 2. Press 'M' to export SkSL shaders to a file
+#    → outputs flutter_01.sksl.json
+
+# 3. Build release with bundled shaders
+flutter build apk --bundle-sksl-path flutter_01.sksl.json
+```
+
+This is especially impactful on budget GPUs where shader compilation can add 50–200 ms per unique shader — enough to cause visible stutter on first scroll or first animation.
